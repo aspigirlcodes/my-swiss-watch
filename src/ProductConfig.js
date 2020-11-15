@@ -31,6 +31,17 @@ function Color(props) {
   );
 }
 
+function StrapSelector(props){
+  return(
+    <div className="strapSelector">
+      <label htmlFor="strap-color-select">Select a Strap Color</label>
+      <select onChange={props.handleStrapColor}>
+        {props.strapColors.map(color =><option key={color} value={color}>{color}</option> )}
+      </select>
+    </div>
+  )
+}
+
 function Zoom(props) {
   return (
     <div className="zoom">
@@ -59,15 +70,24 @@ function Zoom(props) {
 class ProductConfig extends Component {
   static Color = Color;
   static Zoom = Zoom;
+  static StrapSelector = StrapSelector
 
   state = {
     colorChoice: this.props.colorOptions[0],
-    zoom: this.props.zoom || 1
+    zoom: this.props.zoom || 1,
+    selectedStrap : this.props.strapColors[0]
   };
 
   handleColor = e => {
     let change = {};
     change[e.target.name] = JSON.parse(e.target.value);
+    this.setState(change);
+  };
+
+  handleStrapColor = e => {
+    let change = {};
+    change['selectedStrap'] = e.target.value;
+    console.log(change)
     this.setState(change);
   };
 
@@ -80,9 +100,11 @@ class ProductConfig extends Component {
       <React.Fragment>
         {this.props.children(
           this.props.colorOptions,
+          this.props.strapColors,
           { ...this.state },
           this.handleColor,
-          this.handleZoom
+          this.handleZoom,
+          this.handleStrapColor
         )}
       </React.Fragment>
     );

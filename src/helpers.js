@@ -219,6 +219,7 @@ function drawCustomHand(ctx, rect) {
 
 function drawCanvas(ctx, props, time, canvasWidth) {
   const { primary, secondary, tertiary, quaternary } = props.colors || {};
+  const strapColor = props.selectedStrap
   const baseRadius = canvasWidth / 2;
 
   variableRadius = baseRadius * (props.zoom || 1);
@@ -235,7 +236,7 @@ function drawCanvas(ctx, props, time, canvasWidth) {
   ctx.translate(variableRadius - zoomOffset, variableRadius - zoomOffset);
   ctx.save(); // saves the basic ctx
 
-  drawStrap(ctx, getStrap(primary));
+  drawStrap(ctx, getStrap(strapColor));
   drawArcs(ctx, getArcs(primary));
   drawLines(ctx, getLines(secondary, tertiary));
   drawText(ctx, getText(secondary, tertiary));

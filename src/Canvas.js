@@ -19,15 +19,12 @@ class Canvas extends Component {
     return this.setState({ time: { hours, minutes, seconds } });
   }
 
-  componentWillMount() {
+  componentDidMount() {
     this.setTime(
       window.setInterval(() => {
         this.setTime();
       }, 1000)
     );
-  }
-
-  componentDidMount() {
     this.ctx = this.refs.canvas.getContext("2d");
     drawCanvas(
       this.ctx,
