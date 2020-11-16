@@ -233,7 +233,7 @@ const strapColors = [
 
 ReactDOM.render(
   <ProductConfig colorOptions={colorArray1} strapColors={strapColors}>
-    {(colorOptions, strapColors, { colorChoice, zoom, selectedStrap }, handleColor, handleZoom, handleStrapColor) => (
+    {( {colorChoice, zoom, selectedStrap} ) => (
       <div className="product-container">
         <h1>A custom header!</h1>
         <div className="product-body">
@@ -242,16 +242,9 @@ ReactDOM.render(
           </div>
           <div className="column">
             <p>lorem ipsum...</p>
-            <ProductConfig.Color
-              colorOptions= {colorOptions}
-              colorChoice={colorChoice}
-              onChange={handleColor}
-            />
-            <ProductConfig.Zoom zoom={zoom} handleZoom={handleZoom} colorChoice={colorChoice}/>
-            <ProductConfig.StrapSelector
-              strapColors= {strapColors}
-              handleStrapColor = {handleStrapColor}
-            />
+            <ProductConfig.Color/>
+            <ProductConfig.Zoom/>
+            <ProductConfig.StrapSelector/>
           </div>
         </div>
         

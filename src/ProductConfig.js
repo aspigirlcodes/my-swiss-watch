@@ -2,68 +2,87 @@ import React, { Component } from "react";
 import Slider from "rc-slider"; // Slider UI lib
 import "rc-slider/assets/index.css"; // Slider CSS
 
-function Color(props) {
+const { Provider, Consumer } = React.createContext();
+
+
+function Color() {
   return (
-    <fieldset className="colors-container">
-      {props.colorOptions.map(option => (
-        <label className="colorOption" key={option.description}>
-          <input
-            type="radio"
-            name="colorChoice"
-            value={JSON.stringify(option)}
-            onChange={props.onChange}
-            checked={
-              props.colorChoice.description === option.description
-                ? "checked"
-                : ""
-            }
-          />
-          <ul>
-            <li style={{ backgroundColor: option.primary }} />
-            <li style={{ backgroundColor: option.secondary }} />
-            <li style={{ backgroundColor: option.tertiary }} />
-            <li style={{ backgroundColor: option.quaternary }} />
-          </ul>
-          <span>{option.description}</span>
-        </label>
-      ))}
-    </fieldset>
+    <Consumer>
+      {({colorOptions, colorChoice, handleColor})=>(
+        <fieldset className="colors-container">
+          {colorOptions.map(option => (
+            <label className="colorOption" key={option.description}>
+              <input
+                type="radio"
+                name="colorChoice"
+                value={JSON.stringify(option)}
+                onChange={handleColor}
+                checked={
+                  colorChoice.description === option.description
+                    ? "checked"
+                    : ""
+                }
+              />
+              <ul>
+                <li style={{ backgroundColor: option.primary }} />
+                <li style={{ backgroundColor: option.secondary }} />
+                <li style={{ backgroundColor: option.tertiary }} />
+                <li style={{ backgroundColor: option.quaternary }} />
+              </ul>
+              <span>{option.description}</span>
+            </label>
+          ))}
+        </fieldset>
+      )}
+      
+    </Consumer>
+    
   );
 }
 
-function StrapSelector(props){
+function StrapSelector(){
   return(
-    <div className="strapSelector">
-      <label htmlFor="strap-color-select">Select a Strap Color</label>
-      <select onChange={props.handleStrapColor}>
-        {props.strapColors.map(color =><option key={color} value={color}>{color}</option> )}
-      </select>
-    </div>
+    <Consumer>
+      {({strapColors, handleStrapColor}) => (
+        <div className="strapSelector">
+          <label htmlFor="strap-color-select">Select a Strap Color</label>
+          <select onChange={handleStrapColor}>
+            {strapColors.map(color =><option key={color} value={color}>{color}</option> )}
+          </select>
+        </div>
+      )}
+    </Consumer>
+    
   )
 }
 
-function Zoom(props) {
+function Zoom() {
   return (
-    <div className="zoom">
-      <label>
-        {props.zoom > 1.25
-          ? "Zoom-out to get the bigger picture."
-          : "Zoom-in for a more detailed view."}
-      </label>
-      <Slider
-        value={props.zoom}
-        min={1}
-        max={1.5}
-        step={0.1}
-        onChange={props.handleZoom}
-        trackStyle={{ backgroundColor: props.colorChoice.secondary }}
-        railStyle={{ backgroundColor: props.colorChoice.tertiary }}
-        handleStyle={{
-          backgroundColor: props.colorChoice.primary,
-          borderColor: props.colorChoice.tertiary
-        }}
-      />
-    </div>
+    <Consumer> 
+      {({colorChoice, zoom, handleZoom})=>(
+        <div className="zoom">
+          <label>
+            {zoom > 1.25
+              ? "Zoom-out to get the bigger picture."
+              : "Zoom-in for a more detailed view."}
+          </label>
+          <Slider
+            value={zoom}
+            min={1}
+            max={1.5}
+            step={0.1}
+            onChange={handleZoom}
+            trackStyle={{ backgroundColor: colorChoice.secondary }}
+            railStyle={{ backgroundColor: colorChoice.tertiary }}
+            handleStyle={{
+              backgroundColor: colorChoice.primary,
+              borderColor: colorChoice.tertiary
+            }}
+          />
+        </div>
+      )}
+    
+    </Consumer>
   );
 }
 
@@ -97,16 +116,16 @@ class ProductConfig extends Component {
 
   render() {
     return (
-      <React.Fragment>
-        {this.props.children(
-          this.props.colorOptions,
-          this.props.strapColors,
-          { ...this.state },
-          this.handleColor,
-          this.handleZoom,
-          this.handleStrapColor
-        )}
-      </React.Fragment>
+      <Provider value={{
+        colorOptions: this.props.colorOptions,
+        strapColors: this.props.strapColors,
+        ...this.state,
+        handleColor: this.handleColor,
+        handleZoom: this.handleZoom,
+        handleStrapColor: this.handleStrapColor
+        }}>
+        {this.props.children({ ...this.state })}
+      </Provider>
     );
   }
 }
