@@ -1,133 +1,96 @@
-import React, { Component } from "react";
+import React, { Component, useCallback, useContext, useState } from "react";
 import Slider from "rc-slider"; // Slider UI lib
 import "rc-slider/assets/index.css"; // Slider CSS
 
-const { Provider, Consumer } = React.createContext();
+const RootContext = React.createContext();
 
 
 function Color() {
+  const {colorOptions, colorChoice, handleColor} = useContext(RootContext)
   return (
-    <Consumer>
-      {({colorOptions, colorChoice, handleColor})=>(
-        <fieldset className="colors-container">
-          {colorOptions.map(option => (
-            <label className="colorOption" key={option.description}>
-              <input
-                type="radio"
-                name="colorChoice"
-                value={JSON.stringify(option)}
-                onChange={handleColor}
-                checked={
-                  colorChoice.description === option.description
-                    ? "checked"
-                    : ""
-                }
-              />
-              <ul>
-                <li style={{ backgroundColor: option.primary }} />
-                <li style={{ backgroundColor: option.secondary }} />
-                <li style={{ backgroundColor: option.tertiary }} />
-                <li style={{ backgroundColor: option.quaternary }} />
-              </ul>
-              <span>{option.description}</span>
-            </label>
-          ))}
-        </fieldset>
-      )}
-      
-    </Consumer>
-    
+    <fieldset className="colors-container">
+      {colorOptions.map(option => (
+        <label className="colorOption" key={option.description}>
+          <input
+            type="radio"
+            name="colorChoice"
+            value={JSON.stringify(option)}
+            onChange={() => handleColor(option)}
+            checked={
+              colorChoice.description === option.description
+                ? "checked"
+                : ""
+            }
+          />
+          <ul>
+            <li style={{ backgroundColor: option.primary }} />
+            <li style={{ backgroundColor: option.secondary }} />
+            <li style={{ backgroundColor: option.tertiary }} />
+            <li style={{ backgroundColor: option.quaternary }} />
+          </ul>
+          <span>{option.description}</span>
+        </label>
+      ))}
+    </fieldset>    
   );
 }
 
 function StrapSelector(){
+  const {strapColors, handleStrapColor} = useContext(RootContext)
   return(
-    <Consumer>
-      {({strapColors, handleStrapColor}) => (
-        <div className="strapSelector">
-          <label htmlFor="strap-color-select">Select a Strap Color</label>
-          <select onChange={handleStrapColor}>
-            {strapColors.map(color =><option key={color} value={color}>{color}</option> )}
-          </select>
-        </div>
-      )}
-    </Consumer>
-    
+    <div className="strapSelector">
+      <label htmlFor="strap-color-select">Select a Strap Color</label>
+      <select onChange={(e) => handleStrapColor(e.currentTarget.value)}>
+        {strapColors.map(color =><option key={color} value={color}>{color}</option> )}
+      </select>
+    </div>
   )
 }
 
 function Zoom() {
+  const {colorChoice, zoom, handleZoom} = useContext(RootContext)
   return (
-    <Consumer> 
-      {({colorChoice, zoom, handleZoom})=>(
-        <div className="zoom">
-          <label>
-            {zoom > 1.25
-              ? "Zoom-out to get the bigger picture."
-              : "Zoom-in for a more detailed view."}
-          </label>
-          <Slider
-            value={zoom}
-            min={1}
-            max={1.5}
-            step={0.1}
-            onChange={handleZoom}
-            trackStyle={{ backgroundColor: colorChoice.secondary }}
-            railStyle={{ backgroundColor: colorChoice.tertiary }}
-            handleStyle={{
-              backgroundColor: colorChoice.primary,
-              borderColor: colorChoice.tertiary
-            }}
-          />
-        </div>
-      )}
-    
-    </Consumer>
+    <div className="zoom">
+      <label>
+        {zoom > 1.25
+          ? "Zoom-out to get the bigger picture."
+          : "Zoom-in for a more detailed view."}
+      </label>
+      <Slider
+        value={zoom}
+        min={1}
+        max={1.5}
+        step={0.1}
+        onChange={handleZoom}
+        trackStyle={{ backgroundColor: colorChoice.secondary }}
+        railStyle={{ backgroundColor: colorChoice.tertiary }}
+        handleStyle={{
+          backgroundColor: colorChoice.primary,
+          borderColor: colorChoice.tertiary
+        }}
+      />
+    </div>
   );
 }
 
-class ProductConfig extends Component {
-  static Color = Color;
-  static Zoom = Zoom;
-  static StrapSelector = StrapSelector
-
-  state = {
-    colorChoice: this.props.colorOptions[0],
-    zoom: this.props.zoom || 1,
-    selectedStrap : this.props.strapColors[0]
-  };
-
-  handleColor = e => {
-    let change = {};
-    change[e.target.name] = JSON.parse(e.target.value);
-    this.setState(change);
-  };
-
-  handleStrapColor = e => {
-    let change = {};
-    change['selectedStrap'] = e.target.value;
-    console.log(change)
-    this.setState(change);
-  };
-
-  handleZoom = value => {
-    this.setState({ zoom: value });
-  };
-
-  render() {
-    return (
-      <Provider value={{
-        colorOptions: this.props.colorOptions,
-        strapColors: this.props.strapColors,
-        ...this.state,
-        handleColor: this.handleColor,
-        handleZoom: this.handleZoom,
-        handleStrapColor: this.handleStrapColor
-        }}>
-        {this.props.children({ ...this.state })}
-      </Provider>
-    );
-  }
+function ProductConfig(props){
+  const {Provider} = RootContext
+  const [colorChoice, setColorChoice] = useState(props.colorOptions[0])
+  const [zoom, setZoom] = useState(props.zoom || 1)
+  const [selectedStrap, setSelectedStrap] = useState(props.strapColors[0])
+  
+  return (
+    <Provider value={{
+      colorOptions: props.colorOptions,
+      strapColors: props.strapColors,
+      colorChoice, zoom, selectedStrap,
+      handleColor: (value) => setColorChoice(value),
+      handleZoom: (value) => setZoom(value),
+      handleStrapColor: (value) => setSelectedStrap(value)
+      }}>
+      {props.children({ colorChoice, zoom, selectedStrap })}
+    </Provider>
+  );
 }
 
 ProductConfig.defaultProps = {
@@ -163,4 +126,4 @@ ProductConfig.defaultProps = {
   ]
 };
 
-export default ProductConfig;
+export {ProductConfig, Color, Zoom, StrapSelector}

@@ -2,7 +2,7 @@ import React from "react";
 import ReactDOM from "react-dom";
 import "./index.css";
 import Canvas from "./Canvas";
-import ProductConfig from "./ProductConfig"
+import {ProductConfig, Color, Zoom, StrapSelector} from "./ProductConfig"
 import "rc-slider/assets/index.css"; // React Slider CSS
 
 
@@ -242,9 +242,9 @@ ReactDOM.render(
           </div>
           <div className="column">
             <p>lorem ipsum...</p>
-            <ProductConfig.Color/>
-            <ProductConfig.Zoom/>
-            <ProductConfig.StrapSelector/>
+            <Color/>
+            <Zoom/>
+            <StrapSelector/>
           </div>
         </div>
         
